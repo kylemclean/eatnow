@@ -3,9 +3,12 @@ package tech.eatnow;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -15,6 +18,10 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -22,10 +29,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.ViewGroup;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+
+    private FirebaseFirestore firestore;
+    private FirestoreRecyclerAdapter foodAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +66,30 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
     }
 
+    private void initFirestore() {
+        firestore = FirebaseFirestore.getInstance();
+        CollectionReference foods = firestore.collection("foods");
+        Query query = foods.limit(100);
+        FirestoreRecyclerOptions<Food> options = new FirestoreRecyclerOptions.Builder<Food>()
+                .setQuery(query, Food.class)
+                .build();
+        foodAdapter = new FirestoreRecyclerAdapter<Food, FoodHolder>(options) {
+            @Override
+            public void onBindViewHolder(FoodHolder holder, int position, Food model) {
+                // TODO
+            }
+
+            @Override
+            public FoodHolder onCreateViewHolder(ViewGroup group, int i) {
+                View view = LayoutInflater.from(group.getContext())
+                        .inflate(R.layout.food, group, false);
+
+                return new FoodHolder(view);
+            }
+        };
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -81,5 +116,18 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initFirestore();
+        foodAdapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        foodAdapter.stopListening();
     }
 }
