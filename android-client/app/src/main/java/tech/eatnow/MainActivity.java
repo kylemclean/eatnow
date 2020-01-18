@@ -20,7 +20,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -30,13 +29,14 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 
     private FirebaseFirestore firestore;
-    private FirestoreRecyclerAdapter foodAdapter;
+    public FirestoreRecyclerAdapter foodAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        initFirestore();
     }
 
     private void initFirestore() {
@@ -77,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onBindViewHolder(FoodHolder holder, int position, Food model) {
                 // TODO
+                ((TextView) holder.itemView.findViewById(R.id.food_name)).setText(model.name);
             }
+
 
             @Override
             public FoodHolder onCreateViewHolder(ViewGroup group, int i) {
@@ -121,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        initFirestore();
         foodAdapter.startListening();
     }
 
