@@ -97,3 +97,4 @@ lint/tmp/
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+server/__pycache__/server.cpython-37.pyc
