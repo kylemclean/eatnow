@@ -31,4 +31,5 @@
     <string name="provider">provider</string>
     <string name="location_permission_request_text">Access to your current location is needed to find the food items closest to you.</string>
     <string name="location_permission_request_title">Current location</string>
+    <string name="get_directions">Get directions</string>
 </resources>

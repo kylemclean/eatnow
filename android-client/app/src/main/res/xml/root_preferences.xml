@@ -26,6 +26,10 @@
             app:key="custom_location"
             app:title="@string/custom_location_title"/>
 
+        <SeekBarPreference
+            app:key="maximum_distance"
+            app:title="@string/maximum_distance_title"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/food_header">
