@@ -134,7 +134,19 @@ public class MainActivity extends AppCompatActivity {
                         new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Log.d("You did it", "You clicked on a thing");
+                                View detailsLayout =
+                                        holder.itemView.findViewById(R.id.food_details_layout);
+                                ImageView expandCollapse =
+                                        holder.itemView.findViewById(R.id.food_expand_collapse);
+                                if (detailsLayout.getVisibility() == View.GONE) {
+                                    detailsLayout.setVisibility(View.VISIBLE);
+                                    expandCollapse.setImageDrawable(getResources().getDrawable(
+                                            R.drawable.ic_expand_less_black_24dp));
+                                } else {
+                                    detailsLayout.setVisibility(View.GONE);
+                                    expandCollapse.setImageDrawable(getResources().getDrawable(
+                                            R.drawable.ic_expand_more_black_24dp));
+                                }
                             }
                         }
                 );
