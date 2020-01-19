@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Firebase Hosting</title>
+
+  <!-- update the version number as needed -->
+  <script defer src="/__/firebase/7.7.0/firebase-app.js"></script>
+  <!-- include only the Firebase features as you need -->
+  <script defer src="/__/firebase/7.7.0/firebase-firestore.js"></script>
+  <script defer src="/__/firebase/7.7.0/firebase-storage.js"></script>
+  <!-- initialize the SDK after all desired features are loaded -->
+  <script defer src="/__/firebase/init.js"></script>
+
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+    #map {
+      height: 100%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #foods {
+      font-family: sans-serif;
+      z-index: 1;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .food {
+      background-color: white;
+      width: 600px;
+      height: 150px;
+    }
+
+    .food-photo {
+      float: left;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .food-distance {
+      color: gray;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div id="foods">
+    <div class="food"></div>
+  </div>
+
+  <script>
+    var map;
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: 45, lng: 45 },
+        zoom: 16
+      });
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(onGetLocation);
+      }
+    }
+
+    function onGetLocation(position) {
+      map.setCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
+    }
+
+    function createFood(food) {
+      food.provider.get().then(provider => {
+        let providerData = provider.data();
+        document.getElementById('foods').appendChild(createFoodElement(food, providerData));
+        new google.maps.Marker({
+          position: {
+            lat: providerData.location.latitude,
+            lng: providerData.location.longitude
+          },
+          title: food.name,
+          map: map
+        });
+      });
+    }
+
+    function createFoodElement(food, provider) {
+      let el = document.createElement('div');
+      el.classList.add('food');
+      let photo = document.createElement('img');
+      photo.classList.add('food-photo');
+      let photoReference = firebase.storage().refFromURL(food.photo);
+      photoReference.getDownloadURL().then(url => {
+        photo.src = url;
+      }).catch(error => {
+        // TODO
+      });
+      el.appendChild(photo);
+      let name = document.createElement('h3');
+      name.classList.add('food-name');
+      name.innerText = food.name;
+      el.appendChild(name);
+      let providerName = document.createElement('span');
+      providerName.classList.add('food-provider');
+      providerName.innerText = provider.name;
+      el.appendChild(providerName);
+      let description = document.createElement('p');
+      description.classList.add('food-description');
+      description.innerText = food.description;
+      el.appendChild(description);
+      let distance = document.createElement('span');
+      distance.classList.add('food-distance');
+      distance.innerText = '999 m'; // TODO
+      el.appendChild(distance);
+      return el;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+      // // The Firebase SDK is initialized and available here!
+      //
+      // firebase.auth().onAuthStateChanged(user => { });
+      // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+      // firebase.messaging().requestPermission().then(() => { });
+      // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+      //
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+
+      firebase.firestore().collection('foods').get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          createFood(doc.data());
+        });
+      });
+
+      try {
+        let app = firebase.app();
+        let features = ['auth', 'firestore', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  </script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAG5ATwjkn4fNi7nr5Pp5Yf1c3ptXaQCeA&callback=initMap"
+    async defer></script>
+</body>
+
+</html>
