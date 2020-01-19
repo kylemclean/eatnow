@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -37,6 +39,46 @@ public class HomeFragment extends Fragment implements SharedPreferences.OnShared
 
     private MapView mapView;
     private GoogleMap map;
+
+    private class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+        private final View window;
+        //private final View contents;
+
+        public CustomInfoWindowAdapter() {
+            this.window = getLayoutInflater().inflate(R.layout.custom_info_window, null);
+            //this.contents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            render(marker, window);
+            return window;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            render(marker, window);
+            return window;
+        }
+
+        private void render(Marker marker, View view) {
+            String title = marker.getTitle();
+            TextView titleUi = view.findViewById(R.id.marker_provider_name);
+            if (title != null) {
+                titleUi.setText(title);
+            } else {
+                titleUi.setText("");
+            }
+
+            String snippet = marker.getSnippet();
+            TextView snippetUi = view.findViewById(R.id.marker_food_names);
+            if (snippet != null) {
+                snippetUi.setText(snippet);
+            } else {
+                snippetUi.setText("");
+            }
+        }
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,6 +114,8 @@ public class HomeFragment extends Fragment implements SharedPreferences.OnShared
                 }
 
                 prefs.registerOnSharedPreferenceChangeListener(HomeFragment.this);
+
+                googleMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
             }
         });
 
