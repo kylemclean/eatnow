@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
+import androidx.preference.SeekBarPreference;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -52,6 +54,12 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
+            SeekBarPreference maximumDistance = ((SeekBarPreference) getPreferenceManager()
+                    .findPreference("maximum_distance"));
+            maximumDistance.setMax(5000);
+            maximumDistance.setMin(100);
+            maximumDistance.setUpdatesContinuously(false);
 
             getPreferenceManager().findPreference("use_current_location")
                     .setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

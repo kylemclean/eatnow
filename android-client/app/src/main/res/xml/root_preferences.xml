@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="@string/location_header">
 
@@ -28,7 +29,8 @@
 
         <SeekBarPreference
             app:key="maximum_distance"
-            app:title="@string/maximum_distance_title"/>
+            app:title="@string/maximum_distance_title"
+            app:showSeekBarValue="true" />
 
     </PreferenceCategory>
 

@@ -1,21 +1,28 @@
 package tech.eatnow.ui.home;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,11 +33,10 @@ import tech.eatnow.SettingsActivity;
 
 import static tech.eatnow.SettingsActivity.PERMISSION_REQUEST_ACCESS_FINE_LOCATION;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener  {
 
     private MapView mapView;
     private GoogleMap map;
-
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -50,21 +56,24 @@ public class HomeFragment extends Fragment {
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
 
-                map.addMarker(new MarkerOptions()
-                        .position(new LatLng(0.0, 0.0))
-                        .title("Jeff"));
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-                if (SettingsActivity.hasLocationPermission(getContext())) {
-                    onLocationEnable();
+                if (prefs.getBoolean("use_current_location", false)) {
+                    if (SettingsActivity.hasLocationPermission(getContext())){
+                        onLocationEnable(getContext());
+                    } else {
+                        onLocationDisable(getContext());
+                        requestPermissions(
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                PERMISSION_REQUEST_ACCESS_FINE_LOCATION);
+                    }
                 } else {
-                    requestPermissions(
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            PERMISSION_REQUEST_ACCESS_FINE_LOCATION);
+                    onLocationDisable(getContext());
                 }
+
+                prefs.registerOnSharedPreferenceChangeListener(HomeFragment.this);
             }
         });
-
-
 
         return root;
     }
@@ -80,13 +89,35 @@ public class HomeFragment extends Fragment {
         }
     }
 
-    public void onLocationEnable() {
-        if (map != null) {
-            map.setMyLocationEnabled(true);
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("use_current_location")) {
+            if (sharedPreferences.getBoolean("use_current_location", false))
+                onLocationEnable(HomeFragment.this.getContext());
+            else
+                onLocationDisable(HomeFragment.this.getContext());
         }
     }
 
-    public void onLocationDisable() {
+    public void onLocationEnable(Context context) {
+        if (map != null) {
+            map.setMyLocationEnabled(true);
+            LocationServices.getFusedLocationProviderClient(context).getLastLocation()
+                    .addOnCompleteListener(new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            Location currentLocation = task.getResult();
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                                    currentLocation.getLatitude(),
+                                    currentLocation.getLongitude()),
+                                    15.0f
+                            ));
+                        }
+                    });
+        }
+    }
+
+    public void onLocationDisable(Context context) {
         if (map != null) {
             map.setMyLocationEnabled(false);
         }
