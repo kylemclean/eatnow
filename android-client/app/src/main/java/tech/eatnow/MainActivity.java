@@ -12,6 +12,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -102,6 +103,15 @@ public class MainActivity extends AppCompatActivity {
                                 Glide.with(photoView.getContext())
                                         .load(task.getResult())
                                         .into(photoView);
+                            }
+                        }
+                );
+
+                holder.itemView.findViewById(R.id.food_card_view).setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.d("You did it", "You clicked on a thing");
                             }
                         }
                 );
