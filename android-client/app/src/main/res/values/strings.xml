@@ -26,4 +26,7 @@
 
     <!-- Food Preferences -->
     <string name="dietary_restrictions_title">Dietary restrictions</string>
+    <string name="user">Button</string>
+    <string name="userbutton">user</string>
+    <string name="provider">provider</string>
 </resources>
