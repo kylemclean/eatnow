@@ -1,10 +1,14 @@
 package tech.eatnow;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -12,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -21,6 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,13 +35,16 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 
     private FirebaseFirestore firestore;
+    private FirebaseStorage storage;
     public FirestoreRecyclerAdapter foodAdapter;
     private Query query;
 
@@ -66,12 +75,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        initFirestore();
+        initFirebase();
     }
 
-    private void initFirestore() {
+    private void initFirebase() {
+        storage = FirebaseStorage.getInstance();
+
         firestore = FirebaseFirestore.getInstance();
-        CollectionReference foods = firestore.collection("foods");
+        final CollectionReference foods = firestore.collection("foods");
         query = foods.limit(100);
 
 
@@ -80,9 +91,20 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         foodAdapter = new FirestoreRecyclerAdapter<Food, FoodHolder>(options) {
             @Override
-            public void onBindViewHolder(FoodHolder holder, int position, Food model) {
+            public void onBindViewHolder(final FoodHolder holder, int position, Food model) {
                 // TODO
                 ((TextView) holder.itemView.findViewById(R.id.food_name)).setText(model.name);
+                storage.getReferenceFromUrl(model.photo).getDownloadUrl().addOnCompleteListener(
+                        new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                ImageView photoView = holder.itemView.findViewById(R.id.food_photo);
+                                Glide.with(photoView.getContext())
+                                        .load(task.getResult())
+                                        .into(photoView);
+                            }
+                        }
+                );
             }
 
 
