@@ -120,9 +120,13 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Uri> task) {
                                 ImageView photoView = holder.itemView.findViewById(R.id.food_photo);
-                                Glide.with(photoView.getContext())
-                                        .load(task.getResult())
-                                        .into(photoView);
+                                try {
+                                    Glide.with(photoView.getContext())
+                                            .load(task.getResult())
+                                            .into(photoView);
+                                } catch (Exception e) {
+                                    // TODO
+                                }
                             }
                         }
                 );
@@ -138,76 +142,79 @@ public class MainActivity extends AppCompatActivity {
                         }
                 );
 
-                food.provider.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (!task.isSuccessful())
-                            return;
+                if (food.provider != null) {
+                    food.provider.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (!task.isSuccessful())
+                                return;
 
-                        final Provider provider = task.getResult().toObject(Provider.class);
+                            final Provider provider = task.getResult().toObject(Provider.class);
 
-                        if (provider != null) {
-                            ((TextView)holder.itemView.findViewById(R.id.provider_name)).setText(provider.name);
+                            if (provider != null) {
+                                ((TextView) holder.itemView.findViewById(R.id.provider_name)).setText(provider.name);
 
 
-                            ((MapView) findViewById(R.id.map_view)).getMapAsync(
-                                    new OnMapReadyCallback() {
-                                        @Override
-                                        public void onMapReady(GoogleMap googleMap) {
-                                            if (!markers.containsKey(provider)) {
-                                                Marker marker = googleMap.addMarker(new MarkerOptions()
-                                                        .position(new LatLng(provider.location.getLatitude(),
-                                                                provider.location.getLongitude()))
-                                                        .title(provider.name)
-                                                        .snippet(food.name)
-                                                );
-                                                markers.put(provider, marker);
-                                            } else {
-                                                markers.get(provider).setSnippet(
-                                                        markers.get(provider).getSnippet() + "\n" + food.name
-                                                );
-                                            }
-
-                                        }
-                                    }
-                            );
-
-                            final TextView distanceToFood = findViewById(R.id.distance_to_food);
-                            if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                                    .getBoolean("use_current_location", false)) {
-                                LocationServices.getFusedLocationProviderClient(MainActivity.this)
-                                        .getLastLocation().addOnCompleteListener(
-                                        new OnCompleteListener<Location>() {
+                                ((MapView) findViewById(R.id.map_view)).getMapAsync(
+                                        new OnMapReadyCallback() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Location> task) {
-                                                Location foodLocation = new Location("jeff");
-                                                foodLocation.setLatitude(provider.location.getLatitude());
-                                                foodLocation.setLongitude(provider.location.getLongitude());
+                                            public void onMapReady(GoogleMap googleMap) {
+                                                if (!markers.containsKey(provider)) {
+                                                    Marker marker = googleMap.addMarker(new MarkerOptions()
+                                                            .position(new LatLng(provider.location.getLatitude(),
+                                                                    provider.location.getLongitude()))
+                                                            .title(provider.name)
+                                                            .snippet(food.name)
+                                                    );
+                                                    markers.put(provider, marker);
+                                                } else {
+                                                    markers.get(provider).setSnippet(
+                                                            markers.get(provider).getSnippet() + "\n" + food.name
+                                                    );
+                                                }
 
-                                                // TODO fix
-                                                distanceToFood.setText(task.getResult().distanceTo(foodLocation) + " m");
                                             }
                                         }
                                 );
-                            } else {
-                                distanceToFood.setVisibility(View.GONE);
-                            }
 
-                            holder.itemView.findViewById(R.id.get_directions_button).setOnClickListener(
-                                    new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                                                    "geo:" + provider.location + "?q=" +
-                                                            provider.name.replace(' ', '+')
-                                            ));
-                                            startActivity(intent);
+                                final TextView distanceToFood = findViewById(R.id.distance_to_food);
+                                if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                                        .getBoolean("use_current_location", false)) {
+                                    LocationServices.getFusedLocationProviderClient(MainActivity.this)
+                                            .getLastLocation().addOnCompleteListener(
+                                            new OnCompleteListener<Location>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Location> task) {
+                                                    Location foodLocation = new Location("jeff");
+                                                    foodLocation.setLatitude(provider.location.getLatitude());
+                                                    foodLocation.setLongitude(provider.location.getLongitude());
+
+                                                    // TODO fix
+                                                    distanceToFood.setText(task.getResult().distanceTo(foodLocation) + " m");
+                                                }
+                                            }
+                                    );
+                                } else {
+                                    distanceToFood.setVisibility(View.GONE);
+                                }
+
+                                holder.itemView.findViewById(R.id.get_directions_button).setOnClickListener(
+                                        new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                                                        "geo:" + provider.location + "?q=" +
+                                                                provider.name.replace(' ', '+')
+                                                ));
+                                                startActivity(intent);
+                                            }
                                         }
-                                    }
-                            );
+                                );
+                            }
                         }
-                    }
-                });
+
+                    });
+                }
             }
 
 
