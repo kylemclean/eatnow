@@ -58,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 
-    private FirebaseFirestore firestore;
-    private FirebaseStorage storage;
+    public FirebaseFirestore firestore;
+    public FirebaseStorage storage;
     public FirestoreRecyclerAdapter foodAdapter;
 
     private HashMap<Provider, Marker> markers = new HashMap<>();
@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateFoods();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "I'm always on duty!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -84,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_send)
+                R.id.nav_home, R.id.nav_add_food)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
