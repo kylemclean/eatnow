@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseFirestore firestore;
     public FirestoreRecyclerAdapter foodAdapter;
+    private Query query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,9 @@ public class MainActivity extends AppCompatActivity {
     private void initFirestore() {
         firestore = FirebaseFirestore.getInstance();
         CollectionReference foods = firestore.collection("foods");
-        Query query = foods.limit(100);
+        query = foods.limit(100);
+
+
         FirestoreRecyclerOptions<Food> options = new FirestoreRecyclerOptions.Builder<Food>()
                 .setQuery(query, Food.class)
                 .build();
