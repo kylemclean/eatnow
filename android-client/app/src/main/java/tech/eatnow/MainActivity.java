@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                 );
 
-                                final TextView distanceToFood = findViewById(R.id.distance_to_food);
+                                final TextView distanceToFood = holder.itemView.findViewById(R.id.distance_to_food);
                                 if (PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
                                         .getBoolean("use_current_location", false)) {
                                     LocationServices.getFusedLocationProviderClient(MainActivity.this)
@@ -187,7 +187,8 @@ public class MainActivity extends AppCompatActivity {
                                                     foodLocation.setLongitude(provider.location.getLongitude());
 
                                                     // TODO fix
-                                                    distanceToFood.setText(task.getResult().distanceTo(foodLocation) + " m");
+                                                    distanceToFood.setText((int) task.getResult().distanceTo(foodLocation) + " m");
+                                                    distanceToFood.setVisibility(View.VISIBLE);
                                                 }
                                             }
                                     );

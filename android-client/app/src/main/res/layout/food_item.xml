@@ -50,7 +50,7 @@
                     android:layout_marginEnd="16dp"
                     android:text="Food name"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView3"
+                    app:layout_constraintEnd_toStartOf="@+id/food_expand_collapse"
                     app:layout_constraintStart_toEndOf="@+id/food_photo"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,11 +78,12 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginBottom="16dp"
                     android:text="999 m"
+                    android:visibility="invisible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <ImageView
-                    android:id="@+id/imageView3"
+                    android:id="@+id/food_expand_collapse"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
