@@ -200,8 +200,14 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void onClick(View v) {
                                                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                                                        "geo:" + provider.location + "?q=" +
-                                                                provider.name.replace(' ', '+')
+                                                        "geo:" +
+                                                                provider.location.getLatitude() +
+                                                                "," +
+                                                                provider.location.getLongitude() +
+                                                        "?z=15" +
+                                                        "&q=" + (provider.address != null ?
+                                                                provider.address.replace(' ', '+')
+                                                                : provider.name.replace(' ', '+'))
                                                 ));
                                                 startActivity(intent);
                                             }

@@ -132,6 +132,8 @@ public class AddFoodFragment extends Fragment {
                             providerField.setText("");
                             photoUri = null;
                             photo.setImageURI(null);
+                        } else {
+                            task.getException().printStackTrace();
                         }
                     }
                 }
