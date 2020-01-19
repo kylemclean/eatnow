@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import tech.eatnow.MainActivity;
 import tech.eatnow.R;
@@ -33,8 +34,10 @@ public class HomeFragment extends Fragment {
         });
 
         RecyclerView foodsView = root.findViewById(R.id.foods_recycler_view);
-        if (foodsView != null)
+        if (foodsView != null) {
             foodsView.setAdapter(((MainActivity) getActivity()).foodAdapter);
+            foodsView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        }
 
         return root;
     }
